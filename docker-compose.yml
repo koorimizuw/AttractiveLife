@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+  nginx:
+    image: nginx
+    container_name: nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - frontend
+      - backend
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      target: "develop"
+    volumes:
+      - "./frontend:/app"
+    command: /bin/sh -c "yarn run dev"
+    ports:
+      - "3000:3000"
+
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      target: "develop"
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+    environment:
+      TZ: Asia/Tokyo
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+    command: /bin/sh -c "yarn run start"
+
+  db:
+    image: mariadb:10.6
+    container_name: db
+    volumes:
+      - ./db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MYSQL_DATABASE: develop
+      MYSQL_USER: root
+      MYSQL_PASSWORD: docker
+      MYSQL_ROOT_PASSWORD: docker
+      TZ: Asia/Tokyo
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
