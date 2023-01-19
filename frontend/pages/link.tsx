@@ -37,7 +37,7 @@ const Connect = styled.div`
   }
 `;
 
-const Disconnect = styled(Button)`
+const MyButton = styled(Button)`
   margin-top: 10px;
   width: 100%;
   border-radius: 10px;
@@ -78,6 +78,12 @@ const Link: NextPage = () => {
     "",
   ]);
 
+  const refresh = async () => {
+    const res = await api.status();
+    if (res.data.error === 1) return;
+    setDetail(res.data);
+  };
+
   const handleConnect = async () => {
     const id = sensorId.join("");
     if (!id) return;
@@ -86,11 +92,7 @@ const Link: NextPage = () => {
     if (data.error === 1) return;
 
     setLinked(true);
-    setTimeout(async () => {
-      const res = await api.status();
-      if (res.data.error === 1) return;
-      setDetail(res.data);
-    }, 2000);
+    setTimeout(refresh, 2000);
   };
 
   const handleDisconnect = async () => {
@@ -118,6 +120,10 @@ const Link: NextPage = () => {
       {linked ? (
         <>
           <Info>
+            <span>Device Name</span>
+            <span>HC-SR04</span>
+          </Info>
+          <Info>
             <span>Device ID</span>
             <span>{detail.id}</span>
           </Info>
@@ -133,14 +139,17 @@ const Link: NextPage = () => {
             <span>HW</span>
             <span>{detail.hw}</span>
           </Info>
-          <Disconnect
+          <MyButton onClick={refresh} variant="outlined" size="large">
+            Refresh Device Info
+          </MyButton>
+          <MyButton
             onClick={handleDisconnect}
             variant="outlined"
             size="large"
             color="error"
           >
             Disconnect
-          </Disconnect>
+          </MyButton>
         </>
       ) : (
         <>

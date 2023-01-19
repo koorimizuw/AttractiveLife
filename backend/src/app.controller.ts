@@ -50,6 +50,7 @@ export class RecordController {
   constructor(
     private readonly appService: AppService,
     private readonly recordService: RecordService,
+    private readonly dataService: DataService,
   ) {}
 
   @Get('list')
@@ -63,6 +64,7 @@ export class RecordController {
     if (!res) return { error: 1 };
     return {
       error: 0,
+      recordId: res,
     };
   }
 
@@ -71,6 +73,23 @@ export class RecordController {
     this.appService.stop();
     return {
       error: 0,
+    };
+  }
+
+  @Get('status')
+  async status() {
+    if (this.appService.recordId === 0) {
+      return {
+        isRecording: false,
+      };
+    }
+    const records = await this.dataService.findByRecordId(
+      this.appService.recordId,
+    );
+    return {
+      isRecording: true,
+      recordId: this.appService.recordId,
+      records,
     };
   }
 }
@@ -82,7 +101,7 @@ export class DataController {
   @Get()
   async list(@Query('record_id') record_id: number) {
     if (!record_id) return [];
-    return this.dataService.findByRecordId(record_id);
+    return await this.dataService.findByRecordId(record_id);
   }
 
   @Get('last')

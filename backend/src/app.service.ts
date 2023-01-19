@@ -16,6 +16,8 @@ export class AppService {
   hcsr04: HCSR04;
   timer: NodeJS.Timer;
 
+  recordId: number = 0;
+
   connect(id: string) {
     if (
       this.sensor?.connectionState === 'connected' ||
@@ -43,6 +45,7 @@ export class AppService {
   async disconnect() {
     if (!this.sensor) return;
 
+    this.stop();
     this.sensor.closeWait();
   }
 
@@ -51,20 +54,25 @@ export class AppService {
     return await this.hcsr04.measureWait();
   }
 
-  async start(name: string): Promise<boolean> {
-    if (!(this.sensor?.connectionState === 'connected')) return false;
+  async start(name: string): Promise<number> {
+    if (this.sensor?.connectionState !== 'connected' || this.recordId !== 0)
+      return 0;
 
     const record = await this.recordService.newRecord(name);
+
+    this.recordId = record.id;
     this.timer = setInterval(async () => {
       const distance = await this.getDistance();
       if (!distance) return;
-      console.log(distance);
       this.dataService.insert(record.id, distance);
     }, 1000);
-    return true;
+    return record.id;
   }
 
   stop(): boolean {
+    if (this.recordId === 0) return false;
+
+    this.recordId = 0;
     clearInterval(this.timer);
     return true;
   }

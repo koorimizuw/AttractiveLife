@@ -13,10 +13,10 @@ import Link from "next/link";
 const RootContainer = styled.div`
   margin: 0 auto;
   max-width: 960px;
-  padding: 10px 0;
+  padding: 20px 10px;
 `;
 
-const pages = ["dashboard", "link"];
+const pages = ["dashboard", "link", "record"];
 
 const darkTheme = createTheme({
   palette: {

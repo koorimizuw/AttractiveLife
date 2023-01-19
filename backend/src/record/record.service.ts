@@ -11,7 +11,7 @@ export class RecordService {
   ) {}
 
   findAll(): Promise<Record[]> {
-    return this.recordRepository.find();
+    return this.recordRepository.find({ order: { id: 'desc' } });
   }
 
   async newRecord(name: string): Promise<Record> {
