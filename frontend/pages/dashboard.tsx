@@ -106,7 +106,7 @@ const Dashboard: NextPage = () => {
   const router = useRouter();
   const [list, setList] = useState<any[]>([]);
   const [lastData, setLastData] = useState<any>();
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
